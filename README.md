@@ -47,8 +47,8 @@ var pubsub = require('pubsub')
 
 * `ps` is a [rpc-stream] wrapped with
   `[ 'publish', 'subscribe', 'unsubscribe', 'unsubscribeAll' ]`
-* `eeOrOpts` must be either a nodejs-eventemitter-compatible eventemitter or
-  an object that gets passed to the [EventEmitter2]-constructor
+* `eeOrOpts` must be either a `require('events')`-compatible eventemitter or
+  an object that gets passed to the [EventEmitter2]-constructor.
 
 ### `ps.publish(event, data)`
 
@@ -81,5 +81,5 @@ ps.subscriptions = { 'some:event': [fn, ..], .. }
 
 gets passed to the constructor of `ps.emitter` ([EventEmitter2]) if
 no arguments are passed to `pubsub()` and is
-`{ delimiter: '.', wildcard: true, maxListeners: 1e6 }` by default
+`{ delimiter: '.', wildcard: true, maxListeners: 1e12 }` by default
 

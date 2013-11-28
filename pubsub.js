@@ -1,6 +1,7 @@
 module.exports = pubsub
 
-pubsub.emitterOptions = { delimiter: '.', wildcard: true, maxListeners: 500 }
+// not sure about maxListeners..
+pubsub.emitterOptions = { delimiter: '.', wildcard: true, maxListeners: 1e12 }
 
 var rpc = require('rpc-stream')
 var EE2 = require('eventemitter2').EventEmitter2
