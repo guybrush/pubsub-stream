@@ -85,5 +85,41 @@ test('unsubscribe',function(t){
   })
 })
 
+test('unsubscribeAll',function(t){
+  var port = 10000+Math.random()*10000|0
+  var serverPs
+  var server = net.createServer(function(s){
+    serverPs = pubsub()
+    s.pipe(serverPs).pipe(s)
+  })
+  var client
+  server.listen(port, function(){
+    client = net.connect(port)
+    var ps = pubsub()
+    client.pipe(ps).pipe(client)
+    var x = 0
+    ps.emitter.on('a',function(){x++})
+    ps.emitter.on('b',function(){x++})
+    ps.subscribe('a',function(){
+      ps.subscribe('b',function(){
+        t.equal(Object.keys(serverPs.subscriptions).length,2)
+        ps.publish('a','a')
+        ps.publish('b','b')
+        ps.unsubscribeAll(function(){
+          t.equal(Object.keys(serverPs.subscriptions).length,0)
+          ps.publish('a','a')
+          ps.publish('b','b')
+          setTimeout(function(){
+            t.equal(x,2)
+            client.end()
+            server.close()
+            t.end()
+          },50)
+        })
+      })
+    })
+  })
+})
+
 /* */
 

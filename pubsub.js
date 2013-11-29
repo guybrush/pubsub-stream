@@ -40,21 +40,21 @@ function pubsub(ee) {
       remote.publish.apply(null, args)
     }
     ee.on(e, subs[e])
-    cb()
+    cb && cb()
   }
   function unsubscribe(d, cb) {
     var e = d[0] || '**' // not sure about this
     if (!subs[e]) return cb()
     ee.removeListener(e, subs[e])
     delete subs[e]
-    cb()
+    cb && cb()
   }
   function unsubscribeAll(cb){
-    Object.keys(subs).forEach(function(fn, e){
-      ee.removeListener(e, fn)
+    Object.keys(subs).forEach(function(e, i){
+      ee.removeListener(e, subs[e])
       delete subs[e]
     })
-    cb()
+    cb && cb()
   }
   return remote
 }
