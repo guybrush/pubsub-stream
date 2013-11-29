@@ -1,6 +1,6 @@
 {
   "name": "pubsub-stream",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "pubsub with eventemitter2 and rpc-stream",
   "main": "pubsub.js",
   "scripts": {
