@@ -12,9 +12,15 @@ var port = 10000+Math.random()*10000|0
 var t = require('assert')
 var net = require('net')
 var EE2 = require('eventemitter2').EventEmitter2
+// ee can be any require('events') compatible emitter
 var ee = new EE2({wildcard:true})
-var server = net.createServer(function(s){s.pipe(pubsub(ee)).pipe(s)})
 var pubsub = require('pubsub')
+
+var server = net.createServer(function(s){
+  var ps = pubsub(ee) 
+  s.pipe(ps).pipe(s)
+  s.on('end',function(){ps.service.unsubscribeAll()})
+})
 
 server.listen(port, function(){
   var todo = 2
@@ -45,22 +51,26 @@ var pubsub = require('pubsub')
 
 ### `var ps = pubsub([eeOrOpts])`
 
-* `ps` is a [rpc-stream] wrapped with
-  `[ 'publish', 'subscribe', 'unsubscribe', 'unsubscribeAll' ]`
+* `ps` is a [RpcStream](https://github.com/dominictarr/rpc-stream#rpcmethods-israw)
+  with the remote api attached to it: 
+  `w = ps.wrap(api); api.map(function(n){ps[n] = w[n]})`
+  where the api is `['publish','subscribe','unsubscribe','unsubscribeAll']`
 * `eeOrOpts` must be either a `require('events')`-compatible eventemitter or
-  an object that gets passed to the [EventEmitter2]-constructor.
+  an object that gets passed to the [EventEmitter2]-constructor. this emitter
+  will be used to publish events to all the subscribers.
 
-### `ps.publish(event, data)`
+### `ps.publish(event, data[, data, ..])`
 
 publish data
 
 ### `ps.subscribe(event, cb)`
 
-subscribe for remote events
+subscribe for remote events, an event-listener will be added to the remote
+emitter
 
 ### `ps.unsubscribe(event, cb)`
 
-delete all subscriptions for this event
+delete all subscriptions for this event, ie. remove remote the event-listeners
 
 ### `ps.unsubscribeAll(cb)`
 
@@ -69,7 +79,11 @@ deletes all subscribtions
 ### `ps.emitter`
 
 remote events you subscribed to will be emitted and the remote end can
-subscribe to this events
+subscribe to events from this emitter
+
+### `ps.service`
+
+the service provided to the remote end
 
 ### `ps.subscriptions`
 
